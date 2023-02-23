@@ -1,7 +1,53 @@
-import tkinter
-import SQLModule
+import tkinter as tk
+import SQLModule as sql
 import pandas as pd
+from IPython.display import display
 
+class Interface(tk.Frame):
+    def __init__(self, root = None):
+        super().__init__(root, width=1800, height=600)
+        self.root = root
+        self.pack() 
+        self.option_add( "*font", "lucida 23 bold " )
+        self.LoginUser()
+        conexion = sql.DBConnection() 
+        self.connection = conexion.DBConnect()  
+
+    def LoginUser(self):
+        self.labelNombre = tk.Label(self, text = " Nombre : ")
+        self.labelClave = tk.Label(self, text = " Clave : ")
+        self.labelNombre.grid(row=1,column=0, padx=10, pady = 10)         
+        self.labelClave.grid(row=2,column=0, padx=10, pady = 10)         
+        self.entryNombre = tk.Entry(self,width=30, borderwidth=3)
+        self.entryClave = tk.Entry(self,width=30, borderwidth=3,show="*")
+        self.entryNombre.grid(row=1,column=1, padx=20, pady = 20)         
+        self.entryClave.grid(row=2,column=1, padx=20, pady = 20)         
+        self.loginButton = tk.Button( self, text="Ingresar",command = lambda: self.login() )
+        self.loginButton.grid(row=3, column=0, columnspan=2,pady=30, padx=10, ipadx=100)
+
+    def login(self):
+
+        print(self.entryNombre.get())
+
+        Empleado = sql.CheckEmpleado(self.entryNombre.get(),self.entryClave.get(),self.connection)     
+    
+        print(Empleado) 
+#        n = Empleado["Nombre"].size
+#    
+#        if n == 1: 
+#            output = " "
+#            interface.destroy()
+#            interface = InterfaceAdministrador(Empleado,connection)
+#     
+#        elif n > 1:
+#            output = " Más de un empleado con este Nombre y Clave "
+#
+#        else:
+#            output = " Nombre o Clave incorrectas "
+#
+#        loginLabel = tkinter.Label(interface, text = output )
+#        loginLabel.grid(row=5, column=0, columnspan=2,pady=20, padx=10, ipadx=100 )
+#        loginLabel.config(font=("Arial", 20))
 
 def StartInterface(): 
     interface = tkinter.Tk()
@@ -10,137 +56,61 @@ def StartInterface():
 
     return(interface)
 
-def InterfaceUsuario(Usuario,connection):
+def InterfaceAdministrador(Empleado,connection):
 
     interface = tkinter.Tk()
     interface.title("JonAutos Interface")
     interface.geometry("1800x600")
 
-    # Font Size
-    FSize = 15
-    WSize = 15
+    interface.option_add( "*font", "lucida 20 bold " )
 
-    nombre = Usuario["Nombre"][0]
-    cedula = Usuario["Cedula"][0]
-    cargo = Usuario["Tipo"][0]
+    nombre = Empleado["Nombre"][0]
+    cedula = Empleado["Cedula"][0]
+    cargo = Empleado["Tipo"][0]
 
-    Sucursal = SQLModule.UsuarioSucursal(cedula,connection)
-    SucName = Sucursal["NombreSucursal"][0]
+    user = " Empleado:  %s  Identificacion:  %s  Cargo:  %s  " %(nombre,cedula,cargo)
 
-    user = " Usuario:  %s  Identificacion:  %s  Cargo:  %s  Sucursal:  %s " %(nombre,cedula,cargo,SucName)
+    interface.title(user)
 
-    UserLabel = tkinter.Label(interface, text = user )
-    UserLabel.grid(row=0, column=0, columnspan=5, pady=20, padx=10, ipadx=100 )
-    UserLabel.config(font=("Arial", 20))
+    #Menus implementation
 
-    # Optionmenu for each table modifications
-    strAutos = tkinter.StringVar()
-    strAutos.set(" Auto ") 
-    menuAutos = tkinter.OptionMenu(interface,strAutos," Agregar Auto "," Borrar Auto ", " Listar Auto ")
-    menuAutos.grid(row=1,column=0)
-    menuAutos.config(font=("Arial", FSize),width=WSize)
- 
-    strBodega = tkinter.StringVar()
-    strBodega.set(" Bodega") 
-    menuBodega = tkinter.OptionMenu(interface,strBodega," Agregar Bodega"," Borrar Bodega", " Listar Bodega")
-    menuBodega.grid(row=1,column=1)
-    menuBodega.config(font=("Arial", FSize),width=WSize)
+    menubar = tkinter.Menu(interface)
 
-    strCliente = tkinter.StringVar()
-    strCliente.set(" Cliente") 
-    menuCliente = tkinter.OptionMenu(interface,strCliente," Agregar Cliente"," Borrar Cliente", " Listar Cliente")
-    menuCliente.grid(row=1,column=2)
-    menuCliente.config(font=("Arial", FSize),width=WSize)
+    AutosMenu = tkinter.Menu(menubar, tearoff=0)
+    AutosMenu.add_command(label="Crear Tabla", command=lambda:SQLModule.CreateAutos(connection))
+    AutosMenu.add_command(label="Listar", command=lambda:Listar(connection,"Autos"))
+    AutosMenu.add_command(label="Eliminar Tabla", command=lambda:SQLModule.DropAutos(connection))
 
-    strFactura = tkinter.StringVar()
-    strFactura.set(" Factura") 
-    menuFactura = tkinter.OptionMenu(interface,strFactura," Agregar Factura"," Borrar Factura", " Listar Factura")
-    menuFactura.grid(row=1,column=3)
-    menuFactura.config(font=("Arial", FSize),width=WSize)
- 
-    strInvSala = tkinter.StringVar()
-    strInvSala.set(" Cliente") 
-    menuInvSala = tkinter.OptionMenu(interface,strInvSala," Agregar Inverntario Sala"," Borrar Inverntario Sala", " Listar Inverntario Sala")
-    menuInvSala.grid(row=1,column=4)
-    menuInvSala.config(font=("Arial", FSize),width=WSize)
+    ClientesMenu = tkinter.Menu(menubar, tearoff=0)
+    ClientesMenu.add_command(label="Listar", command=lambda:ListarClientes(connection))
 
-    strOrdBodSala = tkinter.StringVar()
-    strOrdBodSala.set(" OrdenBodegaSala") 
-    menuOrdBodSala = tkinter.OptionMenu(interface,strOrdBodSala," Agregar OrdenBodegaSala"," Borrar OrdenBodegaSala", " Listar OrdenBodegaSala")
-    menuOrdBodSala.grid(row=1,column=5)
-    menuOrdBodSala.config(font=("Arial", FSize),width=WSize)
+    EmpleadosMenu = tkinter.Menu(menubar, tearoff=0)
+    EmpleadosMenu.add_command(label="Listar", command=lambda:SQLModule.ListarEmpleados(connection))
 
-    strSalaVentas = tkinter.StringVar()
-    strSalaVentas.set(" SalaVentas") 
-    menuSalaVentas = tkinter.OptionMenu(interface,strSalaVentas," Agregar SalaVentas"," Borrar SalaVentas", " Listar SalaVentas")
-    menuSalaVentas.grid(row=1,column=6)
-    menuSalaVentas.config(font=("Arial", FSize),width=WSize)
+    FacturasMenu = tkinter.Menu(menubar, tearoff=0)
+    FacturasMenu.add_command(label="Listar", command=lambda:SQLModule.ListarFacturas(connection))
 
-    strSucursal = tkinter.StringVar()
-    strSucursal.set(" Sucursal") 
-    menuSucursal = tkinter.OptionMenu(interface,strSucursal," Agregar Sucursal"," Borrar Sucursal", " Listar Sucursal")
-    menuSucursal.grid(row=1,column=7)
-    menuSucursal.config(font=("Arial", FSize),width=WSize)
+    InventariosMenu = tkinter.Menu(menubar, tearoff=0)
+    InventariosMenu.add_command(label="Listar", command=lambda:SQLModule.ListarInventarios(connection))
 
-    strUsuario = tkinter.StringVar()
-    strUsuario.set(" Usuario") 
-    menuUsuario = tkinter.OptionMenu(interface,strUsuario," Agregar Usuario"," Borrar Usuario", " Listar Usuario")
-    menuUsuario.grid(row=1,column=8)
-    menuUsuario.config(font=("Arial", FSize),width=WSize)
+    OrdenComprasMenu = tkinter.Menu(menubar, tearoff=0)
+    OrdenComprasMenu.add_command(label="Listar", command=lambda:SQLModule.ListarOrdenCompras(connection))
 
-    strVendedor = tkinter.StringVar()
-    strVendedor.set(" Vendedor") 
-    menuVendedor = tkinter.OptionMenu(interface,strVendedor," Agregar Vendedor"," Borrar Vendedor", " Listar Vendedor")
-    menuVendedor.grid(row=1,column=9)
-    menuVendedor.config(font=("Arial", FSize),width=WSize)
+    menubar.add_cascade(label="Autos", menu=AutosMenu)
+    menubar.add_cascade(label="Clientes", menu=ClientesMenu)
+    menubar.add_cascade(label="Empleados", menu=ClientesMenu)
+    menubar.add_cascade(label="Facturas", menu=ClientesMenu)
+    menubar.add_cascade(label="Inventarios", menu=ClientesMenu)
+    menubar.add_cascade(label="OrdenCompras", menu=ClientesMenu)
 
-    return(interface)
+    interface.config(menu=menubar)
 
+    return interface
 
+def ListarClientes(connection):
 
-def UserMenu(interface):
-    click = tkinter.StringVar()
-    click.set( " Usuario " )
-    menu = tkinter.OptionMenu( interface, click, "Gerente General", "Gerente Sucursal" )
-    menu.grid( row=0, column=0, padx=30, pady = 20 )   
- 
-    return menu
+    ClientesDF = SQLModule.ListarClientes(connection)
+    display(ClientesDF)
+    print(ClientesDF.iloc[0].tolist())
 
-def login(interface, Name, Key, connection):
-
-    Usuario = SQLModule.CheckUsuario(Name.get(),Key.get(),connection)     
-  
-    n = Usuario["Nombre"].size
-
-    if n == 1: 
-        output = " "
-        interface.destroy()
-        interface = InterfaceUsuario(Usuario,connection)
- 
-    elif n > 1:
-        output = " Más de un usuario con este Nombre y Clave "
-
-    else:
-        output = " Nombre o Clave incorrectas "
-
-    loginLabel = tkinter.Label(interface, text = output )
-    loginLabel.grid(row=5, column=0, columnspan=2,pady=20, padx=10, ipadx=100 )
-    loginLabel.config(font=("Arial", 20))
-
-def UserLogin(interface,connection):
-    Name = tkinter.Entry( interface, width=30, borderwidth=3, font=("Arial", 20) )
-    Name.grid(row=1, column=1, pady=30)
-    Key = tkinter.Entry( interface, width=30, borderwidth=3, show="*", font=("Arial", 20) )
-    Key.grid(row=2, column=1, pady=30)
-
-    NameLabel = tkinter.Label( interface, text=" Nombre Usuario ", font=("Arial", 20) )
-    NameLabel.grid(row=1,column=0)
-    KeyLabel = tkinter.Label( interface, text=" Clave Usuario ", font=("Arial", 20) )
-    KeyLabel.grid(row=2,column=0)
-
-    loginButton = tkinter.Button( interface, text="Ingresar", font=("Arial", 20),
-    command = lambda: login( interface,Name,Key,connection ) )
-    loginButton.grid(row=3, column=0, columnspan=2,pady=30, padx=10, ipadx=100)
-
-    interface.mainloop()
 

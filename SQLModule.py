@@ -3,6 +3,27 @@ import mysql.connector
 from mysql.connector import Error
 import pandas as pd
 
+class DBConnection():
+    def __init__(self):
+        self.User = "Jon"
+        self.UserKey = "$Yes1k1na$"
+        self.DataB   = "JonAutos"
+        self.host = "localhost"    
+
+    def DBConnect(self):
+        connection = None
+        try:
+            connection = mysql.connector.connect(
+                host=self.host,
+                user=self.User,
+                passwd=self.UserKey,
+                database=self.DataB
+            )
+            self.connection = connection
+            print("MySQL Database connection successful")
+        except Error as err:
+            print(f"Error in DBConnection: '{err}'")
+
 def StartDBConnection():
 
    User    = 'Jon'
@@ -36,21 +57,6 @@ def CreateDB(connection, query):
         print("Database created successfully")
     except Error as err:
         print(f"Error in CreateDB: '{err}'")
-
-def DBConnection(host_name, user_name, user_password, db_name):
-    connection = None
-    try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password,
-            database=db_name
-        )
-        print("MySQL Database connection successful")
-    except Error as err:
-        print(f"Error in DBConnection: '{err}'")
-
-    return connection
 
 def ExecuteQuery(connection, query):
     cursor = connection.cursor()
@@ -89,16 +95,12 @@ def ReadQuery(connection, query):
 #  +             Drop Tables               +
 #  +++++++++++++++++++++++++++++++++++++++++++
 def DropTables(connection):
-    ExecuteQuery(connection, DropFactura)
-    ExecuteQuery(connection, DropVendedores)
-    ExecuteQuery(connection, DropOrdenBodegaSala)
-    ExecuteQuery(connection, DropInventarioSala)
-    ExecuteQuery(connection, DropSalaVentas)
-    ExecuteQuery(connection, DropBodega)
-    ExecuteQuery(connection, DropAutos)
-    ExecuteQuery(connection, DropUsuarios)
+    ExecuteQuery(connection, DropFacturas)
+    ExecuteQuery(connection, DropOrdenCompras)
+    ExecuteQuery(connection, DropInventarios)
     ExecuteQuery(connection, DropClientes)
-    ExecuteQuery(connection, DropSucursal)
+    ExecuteQuery(connection, DropEmpleados)
+    ExecuteQuery(connection, DropAutos)
     
 
 
@@ -107,16 +109,12 @@ def DropTables(connection):
 #  +++++++++++++++++++++++++++++++++++++++++++
   
 def CreateTables(connection):
-    ExecuteQuery(connection, CreateSucursal)
     ExecuteQuery(connection, CreateAutos)
-    ExecuteQuery(connection, CreateUsuarios)
+    ExecuteQuery(connection, CreateEmpleados)
     ExecuteQuery(connection, CreateClientes)
-    ExecuteQuery(connection, CreateVendedores)
-    ExecuteQuery(connection, CreateBodega)
-    ExecuteQuery(connection, CreateSalaVentas)
-    ExecuteQuery(connection, CreateOrdenBodegaSala)
-    ExecuteQuery(connection, CreateInventarioSala)
-    ExecuteQuery(connection, CreateFactura)
+    ExecuteQuery(connection, CreateInventarios)
+    ExecuteQuery(connection, CreateOrdenCompras)
+    ExecuteQuery(connection, CreateFacturas)
 
 
 #  +++++++++++++++++++++++++++++++++++++++++++
@@ -124,213 +122,14 @@ def CreateTables(connection):
 #  +++++++++++++++++++++++++++++++++++++++++++
 
 def InsertData(connection):
-    ExecuteQuery(connection, InsertSucursal)
     ExecuteQuery(connection, InsertAutos)
-    ExecuteQuery(connection, InsertUsuarios)
+    ExecuteQuery(connection, InsertEmpleados)
+    ExecuteQuery(connection, InsertClientes)
+    ExecuteQuery(connection, InsertInventarios)
+    ExecuteQuery(connection, InsertOrdenCompras)
+    ExecuteQuery(connection, InsertFacturas)
 
-
-
-# SQL querys .
-
-#  +++++++++++++++++++++++++++++++++++++++++++
-#  +             Table Sucursal              +
-#  +++++++++++++++++++++++++++++++++++++++++++
-
-DropSucursal = ''' DROP TABLE Sucursal;  '''
-
-CreateSucursal = ''' CREATE TABLE Sucursal ( IDSucursal INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre VARCHAR(20) NOT NULL, Ciudad VARCHAR(20) NOT NULL,
-    Presupuesto VARCHAR(5) CHECK (Presupuesto IN('Alto','Medio','Bajo')) );  '''
-
-InsertSucursal = ''' INSERT INTO Sucursal ( Nombre, Ciudad, Presupuesto ) VALUES
-                     ( 'Principal', 'Bogota', 'Alto' ),  
-                     ( 'Cedritos', 'Bogota', 'Alto' ),
-                     ( 'Dorado', 'Bogota', 'Medio' ),
-                     ( 'Centro', 'Bogota', 'Bajo' ),
-                     ( 'Poblado', 'Medellin', 'Alto' ),
-                     ( 'Laureles', 'Medellin', 'Medio' ),
-                     ( 'Santo Domingo', 'Medellin', 'Bajo' ); '''
-
-          
-#  +++++++++++++++++++++++++++++++++++++++++++
-#  +             Table Usuarios              +
-#  +++++++++++++++++++++++++++++++++++++++++++
-
-DropUsuarios = ''' DROP TABLE Usuarios;  '''
-
-CreateUsuarios = ''' CREATE TABLE Usuarios ( IDUsuario INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre VARCHAR(20) NOT NULL, Cedula VARCHAR(6) NOT NULL,
-    IDSucursal INT , Clave VARCHAR(10) NOT NULL, Tipo VARCHAR(20) NOT NULL,
-    CHECK (Tipo IN('Administrador DB','Gerente General','Gerente Sucursal')),
-    FOREIGN KEY (IDSucursal) REFERENCES Sucursal(IDSucursal) );  '''
-
-InsertUsuarios = ''' INSERT INTO Usuarios ( Nombre, Cedula, IDSucursal, Clave, Tipo ) VALUES 
-                     ( 'Jon',2306,1,'2300', 'Administrador DB'),
-                     ( 'Jairo',2307,1,'2300', 'Gerente General'),
-                     ( 'Alejandra',7584,3,'2303', 'Gerente Sucursal'),
-                     ( 'Julian',2548,1,'2301', 'Gerente Sucursal'),
-                     ( 'Tito',1254,2,'2302', 'Gerente Sucursal'),
-                     ( 'Alicia',6589,4,'2304', 'Gerente Sucursal'),
-                     ( 'Carlos',2215,5,'2305', 'Gerente Sucursal'),
-                     ( 'Ana',7845,6,'2306', 'Gerente Sucursal'); '''
-
-def CheckUsuario(nombre,clave,connection):
-    
-    query = f''' SELECT * from Usuarios 
-                 WHERE Nombre=\'{nombre}\' AND Clave=\'{clave}\'; ''' 
-    
-    Results = ReadQuery(connection, query)
-    columns = ['IDUsuario','Nombre','Cedula','IDSucursal', 'Clave', 'Tipo']
-    ResultsDF = pd.DataFrame(Results,columns=columns)
-
-    return ResultsDF
- 
-def AddUsuario(nombre,cedula,idsucursal,clave,tipo,connection):
-    pass 
-
-
-
-
-def UsuarioSucursal(cedula,connection):
-
-    query = f''' SELECT Usuarios.Cedula, Sucursal.Nombre
-                 FROM Usuarios 
-                 JOIN Sucursal ON Usuarios.IDSucursal = Sucursal.IDSucursal
-                 WHERE Usuarios.Cedula = {cedula} ;''' 
-
-    Results = ReadQuery(connection, query)
-    columns = ['Cedula','NombreSucursal']
-    ResultsDF = pd.DataFrame(Results,columns=columns)
-
-    return ResultsDF
-
-#  +++++++++++++++++++++++++++++++++++++++++++
-#  +             Table Clientes              +
-#  +++++++++++++++++++++++++++++++++++++++++++
-
-DropClientes = ''' DROP TABLE Clientes;  '''
-
-CreateClientes = ''' CREATE TABLE Clientes ( IDCliente INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre VARCHAR(20) NOT NULL, Cedula VARCHAR(6) NOT NULL,
-    Ciudad VARCHAR(5) DEFAULT 'TODAS', Clave VARCHAR(10) NOT NULL );  '''
-
-InsertClientes = ''' INSERT INTO Clientes ( Nombre, Cedula, Ciudad, Clave ) VALUES 
-                     ( 'Andres',8951,'Bogota', '21s45'),
-                     ( 'Miguel',1524,'Bogota', '52sd4'),
-                     ( 'Jose',8745,'Medellin', 'dd547'),
-                     ( 'Luisa',9651,'Medellin', 'sqw54'),
-                     ( 'Alex',2015,'Bogota', 'ret74'),
-                     ( 'Diego',3054,'Medellin', '25ty1'),
-                     ( 'Rosa',7840,'Medellin', '5rte2'),
-                     ( 'Julio',9201,'Bogota', '514sq'); '''
-
-
-
-#  +++++++++++++++++++++++++++++++++++++++++++
-#  +             Table Vendedores            +
-#  +++++++++++++++++++++++++++++++++++++++++++
-
-DropVendedores = ''' DROP TABLE Vendedores; '''
-
-
-
-
-
-#  +++++++++++++++++++++++++++++++++++++++++++
-#  +             Table Clientes              +
-#  +++++++++++++++++++++++++++++++++++++++++++
-
-DropClientes = ''' DROP TABLE Clientes;  '''
-
-CreateClientes = ''' CREATE TABLE Clientes ( IDCliente INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre VARCHAR(20) NOT NULL, Cedula VARCHAR(6) NOT NULL,
-    Ciudad VARCHAR(5) DEFAULT 'TODAS', Clave VARCHAR(10) NOT NULL );  '''
-
-InsertClientes = ''' INSERT INTO Clientes ( Nombre, Cedula, Ciudad, Clave ) VALUES 
-                     ( 'Andres',8951,'Bogota', '21s45'),
-                     ( 'Miguel',1524,'Bogota', '52sd4'),
-                     ( 'Jose',8745,'Medellin', 'dd547'),
-                     ( 'Luisa',9651,'Medellin', 'sqw54'),
-                     ( 'Alex',2015,'Bogota', 'ret74'),
-                     ( 'Diego',3054,'Medellin', '25ty1'),
-                     ( 'Rosa',7840,'Medellin', '5rte2'),
-                     ( 'Julio',9201,'Bogota', '514sq'); '''
-
-
-
-#  +++++++++++++++++++++++++++++++++++++++++++
-#  +             Table Vendedores            +
-#  +++++++++++++++++++++++++++++++++++++++++++
-
-DropVendedores = ''' DROP TABLE Vendedores; '''
-
-CreateVendedores = ''' CREATE TABLE Vendedores ( IDVendedor INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre VARCHAR(20) NOT NULL, Cedula VARCHAR(6) NOT NULL,
-    IDSucursal INT , Clave VARCHAR(10) NOT NULL,
-    FOREIGN KEY ( IDSucursal ) REFERENCES Sucursal(IDSucursal) );  '''
-
-#  +++++++++++++++++++++++++++++++++++++++++++
-#  +             Table Bodega                +
-#  +++++++++++++++++++++++++++++++++++++++++++
-
-DropBodega = ''' DROP TABLE Bodega;  '''
-
-CreateBodega = ''' CREATE TABLE Bodega ( IDBodega INT AUTO_INCREMENT PRIMARY KEY,
-    IDSucursal INT, Ciudad VARCHAR(10) NOT NULL, 
-    Nombre VARCHAR(10) NOT NULL, Capacidad INT NOT NULL,
-    FOREIGN KEY ( IDSucursal ) REFERENCES Sucursal(IDSucursal) );  '''
-
-#  +++++++++++++++++++++++++++++++++++++++++++
-#  +             Table SalaVentas            +
-#  +++++++++++++++++++++++++++++++++++++++++++
-
-DropSalaVentas = ''' DROP TABLE SalaVentas;  '''
-
-CreateSalaVentas = ''' CREATE TABLE SalaVentas ( IDSalaVentas INT AUTO_INCREMENT PRIMARY KEY,
-    IDSucursal INT, Ciudad VARCHAR(10) NOT NULL, 
-    Nombre VARCHAR(10) NOT NULL, Capacidad INT NOT NULL,
-    FOREIGN KEY ( IDSucursal ) REFERENCES Sucursal(IDSucursal) );  '''
-
-
-#  +++++++++++++++++++++++++++++++++++++++++++
-#  +             Table OrdenBodegaSala       +
-#  +++++++++++++++++++++++++++++++++++++++++++
-
-DropOrdenBodegaSala = ''' DROP TABLE OrdenBodegaSala;  '''
-
-CreateOrdenBodegaSala = ''' CREATE TABLE OrdenBodegaSala ( IDOrden INT AUTO_INCREMENT PRIMARY KEY,
-    IDBodega INT, IDSalaVentas INT,IDAuto INT, Precio DECIMAL(12,3),
-    Cantidad INT NOT NULL, FechaOrden DATE NOT NULL, FechaEntrega DATE, 
-    FOREIGN KEY ( IDBodega ) REFERENCES Bodega(IDBodega),
-    FOREIGN KEY ( IDSalaventas ) REFERENCES SalaVentas(IDSalaVentas), 
-    FOREIGN KEY ( IDAuto ) REFERENCES Autos(IDAuto) );  '''
-
-#  +++++++++++++++++++++++++++++++++++++++++++
-#  +             Table InventarioSala        +
-#  +++++++++++++++++++++++++++++++++++++++++++
-
-DropInventarioSala = ''' DROP TABLE InventarioSala;  '''
-
-CreateInventarioSala = ''' CREATE TABLE InventarioSala ( IDInventario INT AUTO_INCREMENT PRIMARY KEY,
-    IDSalaVentas INT, IDAuto INT,
-    Cantidad INT NOT NULL, Fecha DATE NOT NULL,
-    FOREIGN KEY ( IDSalaventas ) REFERENCES SalaVentas(IDSalaVentas), 
-    FOREIGN KEY ( IDAuto ) REFERENCES Autos(IDAuto) );  '''
-
-#  +++++++++++++++++++++++++++++++++++++++++++
-#  +             Table Factura               +
-#  +++++++++++++++++++++++++++++++++++++++++++
-
-DropFactura = ''' DROP TABLE Factura;  '''
-
-CreateFactura = ''' CREATE TABLE Factura ( IDFactura INT AUTO_INCREMENT PRIMARY KEY,
-    IDSalaVentas INT, IDCliente INT, IDVendedor INT, IDAuto INT,
-    Cantidad INT NOT NULL, Fecha DATE NOT NULL , Precio DECIMAL (12,3) NOT NULL, 
-    FOREIGN KEY ( IDSalaventas ) REFERENCES SalaVentas(IDSalaVentas), 
-    FOREIGN KEY ( IDAuto ) REFERENCES Autos(IDAuto),
-    FOREIGN KEY ( IDCliente ) REFERENCES Clientes(IDCliente),
-    FOREIGN KEY ( IDVendedor ) REFERENCES Vendedores(IDVendedor) ); '''
-
+# SQL Tables.
 
 #  +++++++++++++++++++++++++++++++++++++++++++
 #  +             Table Autos                 +
@@ -339,36 +138,218 @@ CreateFactura = ''' CREATE TABLE Factura ( IDFactura INT AUTO_INCREMENT PRIMARY 
 DropAutos = ''' DROP TABLE Autos;  '''
 
 CreateAutos = ''' CREATE TABLE Autos ( IDAuto INT AUTO_INCREMENT PRIMARY KEY,
-    Marca VARCHAR(20) NOT NULL, Modelo VARCHAR(10) NOT NULL,
-    anio VARCHAR(5), NumeroMotor VARCHAR(10) NOT NULL );  '''
+                  Marca VARCHAR(15) NOT NULL, Linea VARCHAR(20) NOT NULL, 
+                  Modelo INT NOT NULL );  '''
 
-InsertAutos = ''' INSERT INTO Autos ( Marca, Modelo, anio, NumeroMotor ) VALUES
-                  ( 'Ford', 'Mustang',2020,'ksjs4120' ),
-                  ( 'Ford', 'Mustang',2020,'ksjs4121' ),
-                  ( 'Ford', 'Mustang',2020,'ksjs4122' ),
-                  ( 'Ford', 'Mustang',2021,'jhsg1250' ),
-                  ( 'Ford', 'Mustang',2021,'jhsg1251' ),
-                  ( 'Ford', 'Mustang',2021,'jhsg1252' ),
-                  ( 'Ford', 'Mustang',2022,'gsft1548' ),
-                  ( 'Ford', 'Mustang',2022,'gsft1549' ),
-                  ( 'Ford', 'Mustang',2022,'gsft1550' ),
-                  ( 'Ford', 'Explorer',2020,'hgdy4586' ),
-                  ( 'Ford', 'Explorer',2020,'hgdy4587' ),
-                  ( 'Ford', 'Explorer',2020,'hgdy4588' ),
-                  ( 'Ford', 'Explorer',2021,'lmsq8457' ),
-                  ( 'Ford', 'Explorer',2021,'lmsq8458' ),
-                  ( 'Ford', 'Explorer',2021,'lmsq8459' ),
-                  ( 'Ford', 'Explorer',2022,'uqst8024' ),
-                  ( 'Ford', 'Explorer',2022,'uqst8025' ),
-                  ( 'Ford', 'Explorer',2022,'uqst8026' ),
-                  ( 'Ford', 'Edge',2020,'thuj5214' ),
-                  ( 'Ford', 'Edge',2020,'thuj5215' ),
-                  ( 'Ford', 'Edge',2020,'thuj5216' ),
-                  ( 'Ford', 'Edge',2021,'wsft8795' ),
-                  ( 'Ford', 'Edge',2021,'wsft8796' ),
-                  ( 'Ford', 'Edge',2021,'wsft8798' ),
-                  ( 'Ford', 'Edge',2022,'qsed2304' ),
-                  ( 'Ford', 'Edge',2022,'qsed2305' ),
-                  ( 'Ford', 'Edge',2022,'qsed2306' ); '''
+InsertAutos = ''' INSERT INTO Autos ( Marca, Linea, Modelo ) VALUES
+                  ( 'Ford', 'Mustang', 2020 ),
+                  ( 'Ford', 'Mustang', 2020 ),
+                  ( 'Ford', 'Mustang', 2020 ),
+                  ( 'Ford', 'Mustang', 2021 ),
+                  ( 'Ford', 'Mustang', 2021 ),
+                  ( 'Ford', 'Mustang', 2021 ),
+                  ( 'Ford', 'Mustang', 2022 ),
+                  ( 'Ford', 'Mustang', 2022 ),
+                  ( 'Ford', 'Mustang', 2022 ),
+                  ( 'Ford', 'Explorer', 2020 ),
+                  ( 'Ford', 'Explorer', 2020 ),
+                  ( 'Ford', 'Explorer', 2020 ),
+                  ( 'Ford', 'Explorer', 2021 ),
+                  ( 'Ford', 'Explorer', 2021 ),
+                  ( 'Ford', 'Explorer', 2021 ),
+                  ( 'Ford', 'Explorer', 2022 ),
+                  ( 'Ford', 'Explorer', 2022 ),
+                  ( 'Ford', 'Explorer', 2022 ),
+                  ( 'Ford', 'Edge', 2020 ),
+                  ( 'Ford', 'Edge', 2020 ),
+                  ( 'Ford', 'Edge', 2020 ),
+                  ( 'Ford', 'Edge', 2021 ),
+                  ( 'Ford', 'Edge', 2021 ),
+                  ( 'Ford', 'Edge', 2021 ),
+                  ( 'Ford', 'Edge', 2022 ),
+                  ( 'Ford', 'Edge', 2022 ),
+                  ( 'Ford', 'Edge', 2022 ); '''
 
+def ListarAutos(connection):
+    query = f''' SELECT * from Autos; ''' 
+    
+    Results = ReadQuery(connection, query)
+    columns = ['IDAuto','Marca','Linea','Modelo']
+    ResultsDF = pd.DataFrame(Results,columns=columns)
+
+
+    return ResultsDF
+
+#  +++++++++++++++++++++++++++++++++++++++++++
+#  +             Table Clientes              +
+#  +++++++++++++++++++++++++++++++++++++++++++
+
+DropClientes = ''' DROP TABLE Clientes;  '''
+
+CreateClientes = ''' CREATE TABLE Clientes ( IDCliente INT AUTO_INCREMENT PRIMARY KEY,
+                     Nombre VARCHAR(20) NOT NULL, Cedula VARCHAR(6) NOT NULL, 
+                     Clave VARCHAR(10) NOT NULL );  '''
+
+InsertClientes = ''' INSERT INTO Clientes ( Nombre, Cedula, Clave ) VALUES 
+                     ( 'Andres', 8951, '21s45' ),
+                     ( 'Miguel', 1524, '52sd4' ),
+                     ( 'Jose', 8745, 'dd547' ),
+                     ( 'Luisa', 9651, 'sqw54' ),
+                     ( 'Alex', 2015, 'ret74' ),
+                     ( 'Diego', 3054, '25ty1' ),
+                     ( 'Rita', 7840, '5rte2' ),
+                     ( 'Julio', 9201, '514sq' ); '''
+
+def ListarClientes(connection):
+    query = f''' SELECT * from Clientes; ''' 
+    
+    Results = ReadQuery(connection, query)
+
+    clientes = []
+    for result in Results:
+        result = list(result)
+        clientes.append(result)
+
+    columns = ['IDCliente','Nombre','Cedula','Clave']
+    ClientesDF = pd.DataFrame(clientes,columns=columns)
+
+    return ClientesDF
+
+#  +++++++++++++++++++++++++++++++++++++++++++
+#  +             Table Empleados             +
+#  +++++++++++++++++++++++++++++++++++++++++++
+
+DropEmpleados= ''' DROP TABLE Empleados  '''
+
+CreateEmpleados= ''' CREATE TABLE Empleados ( IDEmpleado INT AUTO_INCREMENT PRIMARY KEY,
+                     Nombre VARCHAR(20) NOT NULL, Cedula VARCHAR(6) NOT NULL,
+                     Clave VARCHAR(10) NOT NULL, Tipo VARCHAR(20) NOT NULL,
+                     CHECK (Tipo IN('Administrador DB','Gerente','Vendedor')));  '''
+
+InsertEmpleados= ''' INSERT INTO Empleados ( Nombre, Cedula, Clave, Tipo ) VALUES 
+                     ( 'Jon',2306,'2300', 'Administrador DB'),
+                     ( 'Jairo',2307,'2300', 'Gerente'),
+                     ( 'Alejandra',7584,'2303', 'Gerente'),
+                     ( 'Julian',2548,'2301', 'Gerente'),
+                     ( 'Tito',1254,'2302', 'Gerente'),
+                     ( 'Alicia',6589,'2304', 'Vendedor'),
+                     ( 'Carlos',2215,'2305', 'Vendedor'),
+                     ( 'Ana',7845,'2306', 'Vendedor'); '''
+
+def CheckEmpleado(nombre,clave,connection):
+    
+    query = f''' SELECT * from Empleados 
+                 WHERE Nombre=\'{nombre}\' AND Clave=\'{clave}\'; ''' 
+    
+    Results = ReadQuery(connection, query)
+    columns = ['IDEmpleado','Nombre','Cedula','Clave', 'Tipo']
+    ResultsDF = pd.DataFrame(Results,columns=columns)
+
+    return ResultsDF
+ 
+def AddEmpleado(nombre,cedula,idsucursal,clave,tipo,connection):
+    pass 
+
+
+def ListarEmpleados(connection):
+    query = f''' SELECT * from Empleados; ''' 
+    
+    Results = ReadQuery(connection, query)
+    columns = ['IDEmpleado','Nombre','Cedula', 'Clave', 'Tipo']
+    ResultsDF = pd.DataFrame(Results,columns=columns)
+
+    return ResultsDF
+
+#  +++++++++++++++++++++++++++++++++++++++++++
+#  +             Table Facturas               +
+#  +++++++++++++++++++++++++++++++++++++++++++
+
+DropFacturas = ''' DROP TABLE Facturas;  '''
+
+CreateFacturas = ''' CREATE TABLE Facturas ( IDFactura INT AUTO_INCREMENT PRIMARY KEY,
+                     IDEmpleado INT, IDCliente INT, IDAuto INT, 
+                     PrecioUnitario DECIMAL(12.3) NOT NULL, Cantidad INT NOT NULL, 
+                     Fecha DATETIME NOT NULL, ValorTotal DECIMAL (12,3) NOT NULL, 
+                     FOREIGN KEY ( IDEmpleado ) REFERENCES Empleados(IDEmpleado), 
+                     FOREIGN KEY ( IDAuto ) REFERENCES Autos(IDAuto),
+                     FOREIGN KEY ( IDCliente ) REFERENCES Clientes(IDCliente) ); '''
+
+InsertFacturas = ''' INSERT INTO Facturas ( IDEmpleado, IDCliente, IDAuto, PrecioUnitario,
+                     Cantidad, Fecha, ValorTotal ) VALUES 
+                     ( 2,5,3,520325.201,1,'2021-01-13 12:45:56',520325.201),
+                     ( 1,1,6,652100.254,1,'2021-01-15 13:24:21',652100.254),
+                     ( 2,2,2,784521.581,1,'2021-01-14 14:52:01',784521.581), 
+                     ( 3,4,1,201544.854,1,'2021-01-16 11:12:00',201544.854),
+                     ( 2,1,2,789652.784,1,'2021-01-20 16:18:54',789652.784);'''
+
+def ListarFacturas(connection):
+    query = f''' SELECT * from Factura; ''' 
+    
+    Results = ReadQuery(connection, query)
+    columns = ['IDFactura','IDEmpleado','IDCliente','IDVendedor','IDAuto',
+               'Cantidad','ValorTotal']
+    ResultsDF = pd.DataFrame(Results,columns=columns)
+
+    return ResultsDF
+
+#  +++++++++++++++++++++++++++++++++++++++++++
+#  +             Table Inventarios           +
+#  +++++++++++++++++++++++++++++++++++++++++++
+
+DropInventarios = ''' DROP TABLE Inventarios;  '''
+
+CreateInventarios = ''' CREATE TABLE Inventarios ( IDInventario INT AUTO_INCREMENT PRIMARY KEY,
+                        IDEmpleado INT, IDAuto INT, Cantidad INT NOT NULL, Fecha DATE NOT NULL,
+                        FOREIGN KEY ( IDEmpleado ) REFERENCES Empleados(IDEmpleado), 
+                        FOREIGN KEY ( IDAuto ) REFERENCES Autos(IDAuto) );  '''
+
+InsertInventarios = ''' INSERT INTO Inventarios ( IDEmpleado, IDAuto, Cantidad, fecha ) VALUES   
+                        ( 2,4,5,'2021-01-01'),
+                        ( 2,3,7,'2021-01-01'),
+                        ( 2,7,3,'2021-01-01'),
+                        ( 2,9,1,'2021-01-01'),
+                        ( 2,1,8,'2021-01-01');'''
+
+
+def ListarInventarios(connection):
+    query = f''' SELECT * from Inventarios; ''' 
+    
+    Results = ReadQuery(connection, query)
+    columns = ['IDInventario','IDEmpleado','IDAuto','Cantidad','Fecha']
+    ResultsDF = pd.DataFrame(Results,columns=columns)
+
+    return ResultsDF
+
+#  +++++++++++++++++++++++++++++++++++++++++++
+#  +             Table OrdenCompras          +
+#  +++++++++++++++++++++++++++++++++++++++++++
+
+DropOrdenCompras = ''' DROP TABLE OrdenCompras;  '''
+
+CreateOrdenCompras = ''' CREATE TABLE OrdenCompras ( IDOrden INT AUTO_INCREMENT PRIMARY KEY,
+                         IDEmpleado INT, IDAuto INT, Cantidad INT NOT NULL, PrecioCompra DECIMAL(12,3),
+                         FechaOrden DATE NOT NULL, FechaEntrega DATE, 
+                         FOREIGN KEY ( IDEmpleado ) REFERENCES Empleados(IDEmpleado),
+                         FOREIGN KEY ( IDAuto ) REFERENCES Autos(IDAuto) );  '''
+
+InsertOrdenCompras = ''' INSERT INTO OrdenCompras ( IDEmpleado, IDAuto, Cantidad, PrecioCompra, 
+                         FechaOrden, FechaEntrega ) VALUES   
+                         ( 2,1,10,124875.204,'2021-01-01','2021-01-01'),
+                         ( 2,2,10,749215.548,'2021-01-01','2021-01-01'),
+                         ( 2,3,10,500201.245,'2021-01-01','2021-01-01'),
+                         ( 2,4,10,195210.047,'2021-01-01','2021-01-01'),
+                         ( 2,5,10,541982.451,'2021-01-01','2021-01-01'),
+                         ( 2,6,10,648210.589,'2021-01-01','2021-01-01'),
+                         ( 2,7,10,985425.214,'2021-01-01','2021-01-01'),
+                         ( 2,8,10,348965.578,'2021-01-01','2021-01-01'),
+                         ( 2,9,10,961254.854,'2021-01-01','2021-01-01');'''
+
+def ListarOrdenCompras(connection):
+    query = f''' SELECT * from OrdenCompras; ''' 
+    
+    Results = ReadQuery(connection, query)
+    columns = ['IDOrden','IDEmpleado','IDAuto','Cantidad','PrecioCompra','FechaOrden','FechaEntrega' ]
+    ResultsDF = pd.DataFrame(Results,columns=columns)
+
+    return ResultsDF
 

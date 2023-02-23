@@ -5,19 +5,26 @@
 # TO DO list:
 
 # sql commands from all tables
-import SQLModule  
-import Interface
+import tkinter as tk
+import Interface as inter
+import SQLModule as sql
+
+def startInterface():
+    root = tk.Tk()
+    root.title(" JonAutos ")
+    root.resizable(0,0)
+
+    interface = inter.Interface(root = root)
+    interface.mainloop()
 
 if __name__ == '__main__':
 
-    connection = SQLModule.StartDBConnection()
-
-    interface = Interface.StartInterface()
-
-    login = Interface.UserLogin(interface,connection)
-    #interface.mainloop()
+    #connexion = sql.DBConnection()
+    #connexion.DBConnect()    
 
     #SQLModule.DropTables(connection)
     #SQLModule.CreateTables(connection)
     #SQLModule.InsertData(connection)
     
+    startInterface()
+
