@@ -1,7 +1,7 @@
 import pandas as pd
 
 class Empleado():
-    def __init__(self,Id,nombre,cedula,clave,tipo):
+    def __init__(self,nombre,cedula,clave,tipo):
         self.Id = None
         self.Nombre = nombre
         self.Cedula = cedula
@@ -9,8 +9,7 @@ class Empleado():
         self.Tipo = tipo
        
     def __str__(self):
-        return f " Empleado: [{self.id}.{self.Nombre},{self.Cedula},{self.Clave},{self.Tipo}] 
+        return ' Empleado: ' + str(self.Id) + ' ' + self.Nombre + ' ' + str(self.Cedula) + ' ' + self.Clave + ' ' + self.Tipo
 
 
-
-
+# Colocar otroas funciones para hacer más pequeño SQLModule 

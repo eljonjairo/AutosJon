@@ -9,6 +9,16 @@ import tkinter as tk
 import Interface as inter
 import SQLModule as sql
 
+import mysql.connector
+from mysql.connector import Error
+
+def startMsg():
+    print()
+    print(" ******************************************* ")
+    print(" *        Starting Program                 *")
+    print(" ******************************************* ")
+    print()
+
 def startInterface():
     root = tk.Tk()
     root.title(" JonAutos ")
@@ -17,14 +27,10 @@ def startInterface():
     interface = inter.Interface(root = root)
     interface.mainloop()
 
+
 if __name__ == '__main__':
 
-    #connexion = sql.DBConnection()
-    #connexion.DBConnect()    
-
-    #SQLModule.DropTables(connection)
-    #SQLModule.CreateTables(connection)
-    #SQLModule.InsertData(connection)
-    
+    startMsg()
+    sql.startDebug()
     startInterface()
 

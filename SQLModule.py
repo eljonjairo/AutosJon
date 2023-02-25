@@ -3,52 +3,42 @@ import mysql.connector
 from mysql.connector import Error
 import pandas as pd
 
-class DBConnection():
-    def __init__(self):
-        self.User = "Jon"
-        self.UserKey = "$Yes1k1na$"
-        self.DataB   = "JonAutos"
-        self.host = "localhost"    
+def startDebug():
+    msg = ''' 
+    *******************************************
+    *          Starting Debug File            *
+    ******************************************* 
+    '''
+    with open("Debug.out", "w") as f:
+        f.write(msg)
 
-    def DBConnect(self):
-        connection = None
-        try:
-            connection = mysql.connector.connect(
-                host=self.host,
-                user=self.User,
-                passwd=self.UserKey,
-                database=self.DataB
-            )
-            self.connection = connection
-            print("MySQL Database connection successful")
-        except Error as err:
-            print(f"Error in DBConnection: '{err}'")
+def writeDebug(msg):
+    with open("Debug.out", "a") as f:
+        f.write("\n")    
+        f.write(msg)
+        f.write("\n")    
 
-def StartDBConnection():
-
-   User    = 'Jon'
-   UserKey = "$Yes1k1na$"
-   DataB   = 'JonAutos'
-   #connection = ServerConnection("localhost", User, UserKey)
-   connection = DBConnection("localhost", User, UserKey, DataB)
-
-   return connection
-
-
-def ServerConnection(host_name, user_name, user_password):
+def DBConnect():
+    print()
+    print( " DataBase Connection " )
+    print()
+    writeDebug("    SQLModule DBConnect IN ")
     connection = None
     try:
-        connection = mysql.connector.connect(
-            host=host_name,
-            user=user_name,
-            passwd=user_password
-        )   
-        print("MySQL Database connection successful")
+        conexion = mysql.connector.connect(
+            host = "localhost",
+            user = "Jon",
+            passwd = "$Yes1k1na$",
+            database = "JonAutos"
+        )
+        writeDebug("    MySQL Database connection successful")
     except Error as err:
-        print(f"Error in ServerConnectio: '{err}'")
-        
-    return connection
-
+        msg = f"Error in DBConnection: '{err}'"
+        writeDebug(msgf)
+  
+    writeDebug("    SQLModule DBConnect OUT ")
+    print(f' Connected to DataBase' )
+    print()
 
 def CreateDB(connection, query):
     cursor = connection.cursor()
@@ -82,7 +72,7 @@ def ReadQuery(connection, query):
             result = list(result)
             Results.append(result)
         print("Read Query successful")
-        return Results
+    #ClientesDF = pd.DataFrame(clientes,columns=columns)
 
     except Error as err:
         print()
@@ -90,6 +80,7 @@ def ReadQuery(connection, query):
         print()
         print(query)
         print()
+    return Results
 
 #  +++++++++++++++++++++++++++++++++++++++++++
 #  +             Drop Tables               +

@@ -1,0 +1,24 @@
+ 
+    *******************************************
+    *          Starting Debug File            *
+    ******************************************* 
+    
+    Interface Constructor IN
+
+    Interface LoginUser IN
+
+    Interface LoginUser OUT
+
+    SQLModule DBConnect IN 
+
+    MySQL Database connection successful
+
+    SQLModule DBConnect OUT 
+
+    Interface Constructor OUT
+
+    Interface login IN
+
+     Empleado: None kjaja 45452 kaja jjjj
+
+    Interface login OUT
