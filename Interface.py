@@ -13,7 +13,7 @@ class Interface(tk.Frame):
         self.option_add( "*font", "lucida 23 bold " )
         self.LoginUser()
         conexion = sql.DBConnect() 
-        self.connection = conexion
+        self.conexion = conexion
         print(" Interface started ")
         sql.writeDebug("    Interface Constructor OUT")  
 
@@ -30,9 +30,6 @@ class Interface(tk.Frame):
         self.labelClave = tk.Label( self, text = " Clave : " )
         self.labelClave.grid( row=3,column=0, padx=10, pady = 10 )         
 
-        self.labelTipo = tk.Label( self, text = " Tipo : " ) 
-        self.labelTipo.grid( row=4,column=0, padx=10, pady = 10 )         
-       
         self.entryNombre = tk.Entry( self,width=30, borderwidth=3 )
         self.entryNombre.grid( row=1,column=1, padx=20, pady = 20 )         
 
@@ -41,9 +38,6 @@ class Interface(tk.Frame):
 
         self.entryClave = tk.Entry( self,width=30, borderwidth=3, show="*")
         self.entryClave.grid( row=3,column=1, padx=20, pady = 20 )         
-
-        self.entryTipo = tk.Entry( self,width=30, borderwidth=3 )
-        self.entryTipo.grid( row=4,column=1, padx=20, pady = 20 )         
 
         self.loginButton = tk.Button( self, text="Ingresar",command = lambda: self.login() )
         self.loginButton.grid( row=5, column=0, columnspan=2,pady=30, padx=10, ipadx=100 )
@@ -54,17 +48,18 @@ class Interface(tk.Frame):
         sql.writeDebug("    Interface login IN")  
 
         empleado = Empleados.Empleado( self.entryNombre.get(), self.entryCedula.get(), 
-                                       self.entryClave.get(),self.entryTipo.get() )
+                                       self.entryClave.get()," None ")
         
         sql.writeDebug("   " + str(empleado)) 
-        print(empleado)
-        #Empleado = sql.CheckEmpleado(self.entryNombre.get(),self.entryClave.get(),self.connection)     
-        # Veirificar si es Empleado y sacar el Tipo 
+        sql.writeDebug("   " + str(self.conexion)) 
+        tipo = Empleados.isEmpleado(empleado,self.conexion)     
+        # Verificar si es Empleado y sacar el Tipo 
+        sql.writeDebug(f"    empleado es: {tipo} ")  
+
+
+
+
         sql.writeDebug("    Interface login OUT")  
-
-
-
-
 #        n = Empleado["Nombre"].size
 #    
 #        if n == 1: 

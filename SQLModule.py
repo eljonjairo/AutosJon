@@ -23,7 +23,7 @@ def DBConnect():
     print( " DataBase Connection " )
     print()
     writeDebug("    SQLModule DBConnect IN ")
-    connection = None
+    conexion = None
     try:
         conexion = mysql.connector.connect(
             host = "localhost",
@@ -39,6 +39,8 @@ def DBConnect():
     writeDebug("    SQLModule DBConnect OUT ")
     print(f' Connected to DataBase' )
     print()
+
+    return conexion
 
 def CreateDB(connection, query):
     cursor = connection.cursor()
@@ -227,17 +229,6 @@ InsertEmpleados= ''' INSERT INTO Empleados ( Nombre, Cedula, Clave, Tipo ) VALUE
                      ( 'Carlos',2215,'2305', 'Vendedor'),
                      ( 'Ana',7845,'2306', 'Vendedor'); '''
 
-def CheckEmpleado(nombre,clave,connection):
-    
-    query = f''' SELECT * from Empleados 
-                 WHERE Nombre=\'{nombre}\' AND Clave=\'{clave}\'; ''' 
-    
-    Results = ReadQuery(connection, query)
-    columns = ['IDEmpleado','Nombre','Cedula','Clave', 'Tipo']
-    ResultsDF = pd.DataFrame(Results,columns=columns)
-
-    return ResultsDF
- 
 def AddEmpleado(nombre,cedula,idsucursal,clave,tipo,connection):
     pass 
 

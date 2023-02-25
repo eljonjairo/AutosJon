@@ -19,6 +19,20 @@
 
     Interface login IN
 
-     Empleado: None kjaja 45452 kaja jjjj
+    Empleado--> id: None Nombre: Jon Cedula: 2306 Clave: 2300 Tipo:  None 
+
+   <mysql.connector.connection_cext.CMySQLConnection object at 0x7fe46a72ed70>
+
+    Empleados isEmpleado IN
+
+    query: SELECT * from Empleados 
+                 WHERE Nombre = 'Jon' AND Cedula = 2306 AND Clave = '2300' ; 
+
+       id Nombre Cedula Clave              Tipo
+0   1    Jon   2306  2300  Administrador DB
+
+    Empleados isEmpleado OUT
+
+    empleado es: Administrador DB 
 
     Interface login OUT
