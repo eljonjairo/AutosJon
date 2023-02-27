@@ -14,15 +14,35 @@ class Empleado():
 
 def isEmpleado(empleado,connection):
     sql.writeDebug("    Empleados isEmpleado IN")
+
     query = f''' SELECT * from Empleados 
                  WHERE Nombre = \'{empleado.Nombre}\' AND Cedula = {empleado.Cedula} AND Clave = \'{empleado.Clave}\' ; '''
     sql.writeDebug("    query:" + query)
+
     Results = sql.ReadQuery(connection, query)
     columns = ['id','Nombre','Cedula','Clave','Tipo']
     ResultsDF = pd.DataFrame(Results,columns=columns)    
+
     sql.writeDebug("    " + str(ResultsDF))
     sql.writeDebug("    Empleados isEmpleado OUT")
 
-    return ResultsDF['Tipo'][0]
+    empleado.Tipo = ResultsDF['Tipo'][0]
+
+    return empleado
+
+def ListarEmpleados(connection):
+    sql.writeDebug("    Empleados ListarEmpleados IN")
+    query = f''' SELECT * from Empleados; '''
+    sql.writeDebug("    query:" + query)
+
+    Results = sql.ReadQuery(connection, query)
+    columns = ['ID','Nombre','Cedula', 'Clave', 'Tipo']
+    ResultsDF = pd.DataFrame(Results,columns=columns)
+
+    sql.writeDebug("    " + str(ResultsDF))
+    sql.writeDebug("    Empleados ListarEmpleados OUT")
+
+    return ResultsDF
+
 
 # Colocar otroas funciones para hacer más pequeño SQLModule 

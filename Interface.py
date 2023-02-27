@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import SQLModule as sql
 import pandas as pd
 import Empleados
@@ -11,9 +12,7 @@ class Interface(tk.Frame):
         self.root = root
         self.pack() 
         self.option_add( "*font", "lucida 23 bold " )
-        self.LoginUser()
-        conexion = sql.DBConnect() 
-        self.conexion = conexion
+        self.conexion = sql.DBConnect()
         print(" Interface started ")
         sql.writeDebug("    Interface Constructor OUT")  
 
@@ -47,85 +46,101 @@ class Interface(tk.Frame):
     def login(self):
         sql.writeDebug("    Interface login IN")  
 
+        
         empleado = Empleados.Empleado( self.entryNombre.get(), self.entryCedula.get(), 
                                        self.entryClave.get()," None ")
         
         sql.writeDebug("   " + str(empleado)) 
         sql.writeDebug("   " + str(self.conexion)) 
-        tipo = Empleados.isEmpleado(empleado,self.conexion)     
-        # Verificar si es Empleado y sacar el Tipo 
-        sql.writeDebug(f"    empleado es: {tipo} ")  
-
-
-
+        empleado = Empleados.isEmpleado(empleado,self.conexion)     
+        sql.writeDebug(f"    empleado es: {empleado.Tipo} ")  
 
         sql.writeDebug("    Interface login OUT")  
-#        n = Empleado["Nombre"].size
-#    
-#        if n == 1: 
-#            output = " "
-#            interface.destroy()
-#            interface = InterfaceAdministrador(Empleado,connection)
-#     
-#        elif n > 1:
-#            output = " Más de un empleado con este Nombre y Clave "
-#
-#        else:
-#            output = " Nombre o Clave incorrectas "
-#
-#        loginLabel = tkinter.Label(interface, text = output )
-#        loginLabel.grid(row=5, column=0, columnspan=2,pady=20, padx=10, ipadx=100 )
-#        loginLabel.config(font=("Arial", 20))
 
-def InterfaceAdministrador(Empleado,connection):
+        MenuAdministrador(self)
 
-    interface = tkinter.Tk()
-    interface.title("JonAutos Interface")
-    interface.geometry("1800x600")
+def MenuAdministrador(self):
+    sql.writeDebug("    MenuAdministrador IN") 
+    self.labelNombre.destroy() 
+    self.labelClave.destroy() 
+    self.labelCedula.destroy() 
+    self.entryCedula.destroy() 
+    self.entryNombre.destroy() 
+    self.entryClave.destroy() 
+    self.loginButton.destroy()
 
-    interface.option_add( "*font", "lucida 20 bold " )
+    root = self.root
+    root.geometry("1200x800")
+    menubar = tk.Menu()
+    root.config(menu=menubar)
 
-    nombre = Empleado["Nombre"][0]
-    cedula = Empleado["Cedula"][0]
-    cargo = Empleado["Tipo"][0]
-
-    user = " Empleado:  %s  Identificacion:  %s  Cargo:  %s  " %(nombre,cedula,cargo)
-
-    interface.title(user)
-
-    #Menus implementation
-
-    menubar = tkinter.Menu(interface)
-
-    AutosMenu = tkinter.Menu(menubar, tearoff=0)
+    AutosMenu = tk.Menu(menubar, tearoff=0)
     AutosMenu.add_command(label="Crear Tabla", command=lambda:SQLModule.CreateAutos(connection))
-    AutosMenu.add_command(label="Listar", command=lambda:Listar(connection,"Autos"))
+    AutosMenu.add_command(label="Listar", command=lambda:Listar(self.conexion,"Autos"))
     AutosMenu.add_command(label="Eliminar Tabla", command=lambda:SQLModule.DropAutos(connection))
+        
+    ClientesMenu = tk.Menu(menubar, tearoff=0)
+    ClientesMenu.add_command(label="Listar")
 
-    ClientesMenu = tkinter.Menu(menubar, tearoff=0)
-    ClientesMenu.add_command(label="Listar", command=lambda:ListarClientes(connection))
+    EmpleadosMenu = tk.Menu(menubar, tearoff=0)
+    EmpleadosMenu.add_command(label="Listar", command=lambda:tablaEmpleados(self))
 
-    EmpleadosMenu = tkinter.Menu(menubar, tearoff=0)
-    EmpleadosMenu.add_command(label="Listar", command=lambda:SQLModule.ListarEmpleados(connection))
+    FacturasMenu = tk.Menu(menubar, tearoff=0)
+    FacturasMenu.add_command(label="Listar")
 
-    FacturasMenu = tkinter.Menu(menubar, tearoff=0)
-    FacturasMenu.add_command(label="Listar", command=lambda:SQLModule.ListarFacturas(connection))
+    InventariosMenu = tk.Menu(menubar, tearoff=0)
+    InventariosMenu.add_command(label="Listar")
 
-    InventariosMenu = tkinter.Menu(menubar, tearoff=0)
-    InventariosMenu.add_command(label="Listar", command=lambda:SQLModule.ListarInventarios(connection))
+    OrdenComprasMenu = tk.Menu(menubar, tearoff=0)
+    OrdenComprasMenu.add_command(label="Listar")
 
-    OrdenComprasMenu = tkinter.Menu(menubar, tearoff=0)
-    OrdenComprasMenu.add_command(label="Listar", command=lambda:SQLModule.ListarOrdenCompras(connection))
+    OrdenComprasMenu = tk.Menu(menubar, tearoff=0)
+    OrdenComprasMenu.add_command(label="Listar")
 
     menubar.add_cascade(label="Autos", menu=AutosMenu)
     menubar.add_cascade(label="Clientes", menu=ClientesMenu)
-    menubar.add_cascade(label="Empleados", menu=ClientesMenu)
-    menubar.add_cascade(label="Facturas", menu=ClientesMenu)
-    menubar.add_cascade(label="Inventarios", menu=ClientesMenu)
-    menubar.add_cascade(label="OrdenCompras", menu=ClientesMenu)
+    menubar.add_cascade(label="Empleados", menu=EmpleadosMenu)
+    menubar.add_cascade(label="Facturas", menu=FacturasMenu)
+    menubar.add_cascade(label="Inventarios", menu=InventariosMenu)
+    menubar.add_cascade(label="OrdenCompras", menu=OrdenComprasMenu)
 
-    interface.config(menu=menubar)
+    sql.writeDebug("    MenuAdministrador OUT") 
+def tablaEmpleados(self):
+    sql.writeDebug("    tablaEmpleados IN") 
+    DF = Empleados.ListarEmpleados(self.conexion)
+    self.tabla = ttk.Treeview(self, column = DF.columns.values)
+    self.tabla.grid(row=1, column=0, columnspan=4, sticky='nse')
+    self.scroll = ttk.Scrollbar(self, orient='vertical', command=self.tabla.yview)
+    self.scroll.grid(row=1,column=4,sticky='nse')
+    self.tabla.configure(yscrollcommand = self.scroll.set)
+   
+    self.tabla.heading('#0', text='ID')
+    self.tabla.heading('#1', text='Nombre')
+    self.tabla.heading('#2', text='Cedula')
+    self.tabla.heading('#3', text='Tipo')
+    style = ttk.Style()
+    style.configure("Treeview.Heading", font=("lucida 23 bold "))
+    style.configure("Treeview", rowheight=40, font=("lucida 20 bold "))
 
-    return interface
+    for idx in reversed(DF.index):
+        row = DF.loc[idx]
+        self.tabla.insert('',0,text=row['ID'],
+        values = (row['Nombre'],row['Cedula'],row['Tipo']))
+ 
+    sql.writeDebug("    tablaEmpleados OUT") 
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

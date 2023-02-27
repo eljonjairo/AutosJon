@@ -25,8 +25,8 @@ def startInterface():
     root.resizable(0,0)
 
     interface = inter.Interface(root = root)
+    interface.LoginUser()
     interface.mainloop()
-
 
 if __name__ == '__main__':
 
