@@ -21,7 +21,7 @@
 
     Empleado--> id: None Nombre: Jon Cedula: 2306 Clave: 2300 Tipo:  None 
 
-   <mysql.connector.connection_cext.CMySQLConnection object at 0x7f7570adb2e0>
+   <mysql.connector.connection_cext.CMySQLConnection object at 0x7f3d2bf37c70>
 
     Empleados isEmpleado IN
 
@@ -41,22 +41,14 @@
 
     MenuAdministrador OUT
 
-    tablaEmpleados IN
+   insertarAuto IN
 
-    Empleados ListarEmpleados IN
+   insertarAuto OUT
 
-    query: SELECT * from Empleados; 
+   insertarCliente IN
 
-       ID     Nombre Cedula Clave              Tipo
-0   1        Jon   2306  2300  Administrador DB
-1   2      Jairo   2307  2300           Gerente
-2   3  Alejandra   7584  2303           Gerente
-3   4     Julian   2548  2301           Gerente
-4   5       Tito   1254  2302           Gerente
-5   6     Alicia   6589  2304          Vendedor
-6   7     Carlos   2215  2305          Vendedor
-7   8        Ana   7845  2306          Vendedor
+   insertarCliente OUT
 
-    Empleados ListarEmpleados OUT
+   insertarAuto IN
 
-    tablaEmpleados OUT
+   insertarAuto OUT

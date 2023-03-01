@@ -95,12 +95,9 @@ def DropTables(connection):
     ExecuteQuery(connection, DropEmpleados)
     ExecuteQuery(connection, DropAutos)
     
-
-
 #  +++++++++++++++++++++++++++++++++++++++++++
 #  +             Create Tables               +
 #  +++++++++++++++++++++++++++++++++++++++++++
-  
 def CreateTables(connection):
     ExecuteQuery(connection, CreateAutos)
     ExecuteQuery(connection, CreateEmpleados)
@@ -109,11 +106,9 @@ def CreateTables(connection):
     ExecuteQuery(connection, CreateOrdenCompras)
     ExecuteQuery(connection, CreateFacturas)
 
-
 #  +++++++++++++++++++++++++++++++++++++++++++
 #  +             Data Into Tables               +
 #  +++++++++++++++++++++++++++++++++++++++++++
-
 def InsertData(connection):
     ExecuteQuery(connection, InsertAutos)
     ExecuteQuery(connection, InsertEmpleados)

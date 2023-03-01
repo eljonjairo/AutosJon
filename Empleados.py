@@ -44,5 +44,18 @@ def ListarEmpleados(connection):
 
     return ResultsDF
 
+def InsertarEmpleado(connection,empleado):
+    sql.writeDebug("    Empleados InsertarEmpleado IN")
+    query = f''' INSERT INTO Empleados ( 'Nombre','Cedula','Clave','Tipo' ) VALUE 
+                 ( \'{empleado.Nombre}\', {empleado.Cedula}, \'{empleado.Clave}\', \'{empleado.Tipo}\' ); '''
+
+
+    sql.writeDebug("    query:" + query)
+
+    sql.ExecuteQuery(connection, query)
+    sql.writeDebug("    Empleados InsertarEmpleado OUT")
+
+
+
 
 # Colocar otroas funciones para hacer más pequeño SQLModule 
